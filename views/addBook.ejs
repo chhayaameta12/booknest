@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Book | BookNest</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <nav>
+        <a href="/" class="logo" aria-label="Book Nest home">
+            <img src="/images/logo.png" alt="Book Nest logo" class="logo-image">
+            <span class="logo-text">Book Nest</span>
+        </a>
+
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/genres">My Shelves</a></li>
+        </ul>
+    </nav>
+
+    <main class="add-book-container">
+
+        <div class="add-book-box">
+
+            <h1>Add Book to "<%= shelf.name %>"</h1>
+
+            <form action="/add-book/<%= shelf.id %>" method="POST" enctype="multipart/form-data">
+
+                <label for="title">Book Title</label>
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    placeholder="Atomic Habits"
+                    required
+                >
+
+                <label for="author">Author</label>
+                <input
+                    type="text"
+                    id="author"
+                    name="author"
+                    placeholder="James Clear"
+                    required
+                >
+
+                <label for="cover_image">Upload Book Cover</label>
+                <input
+                    type="file"
+                    id="cover_image"
+                    name="cover_image"
+                    accept="image/*"
+                >
+
+                <label for="cover_url">Or use an image URL</label>
+                <input
+                    type="text"
+                    id="cover_url"
+                    name="cover_url"
+                    placeholder="https://..."
+                >
+
+                <label for="status">Reading Status</label>
+
+                <select id="status" name="status">
+                    <option value="Want To Read">Want To Read</option>
+                    <option value="Reading">Reading</option>
+                    <option value="Completed" selected>Completed</option>
+                </select>
+
+                <label for="rating">Rating</label>
+
+                <select id="rating" name="rating">
+                    <option value="1">⭐</option>
+                    <option value="2">⭐⭐</option>
+                    <option value="3">⭐⭐⭐</option>
+                    <option value="4">⭐⭐⭐⭐</option>
+                    <option value="5" selected>⭐⭐⭐⭐⭐</option>
+                </select>
+
+                <label for="started_date">Date Started</label>
+                <input
+                    type="date"
+                    id="started_date"
+                    name="started_date"
+                >
+
+                <label for="finished_date">Date Finished</label>
+                <input
+                    type="date"
+                    id="finished_date"
+                    name="finished_date"
+                >
+
+                <label for="review">Review</label>
+                <textarea
+                    id="review"
+                    name="review"
+                    rows="5"
+                    placeholder="Write your thoughts about this book..."
+                ></textarea>
+
+                <label for="quote">Favourite Quote</label>
+                <textarea
+                    id="quote"
+                    name="quote"
+                    rows="3"
+                    placeholder="Add your favourite quote..."
+                ></textarea>
+
+                <label class="checkbox-label">
+                    <input
+                        type="checkbox"
+                        name="favorite"
+                    >
+                    Mark as Favourite
+                </label>
+
+                <button type="submit">
+                    Save Book
+                </button>
+
+            </form>
+
+        </div>
+
+    </main>
+
+    <script src="/js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= shelf.name %> | BookNest</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav>
+
+    <div class="logo">
+        📚 BookNest
+    </div>
+
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/genres">My Shelves</a></li>
+    </ul>
+
+</nav>
+
+<section class="shelf-banner">
+
+    <img
+        src="<%= shelf.image_url %>"
+        alt="<%= shelf.name %>"
+    >
+
+    <div class="banner-overlay">
+        <h1><%= shelf.name %></h1>
+    </div>
+
+</section>
+
+<section class="books-section">
+
+    <div class="section-title">
+
+        <h2>Books</h2>
+
+    </div>
+
+    <div class="books-grid">
+
+        <% books.forEach(book => { %>
+
+            <a href="/book/<%= book.id %>" class="book-cover">
+
+                <img
+                    src="<%= book.cover_url || '/images/default-book.jpg' %>"
+                    alt="<%= book.title %>"
+                >
+
+            </a>
+
+        <% }) %>
+
+        <a href="/add-book/<%= shelf.id %>" class="add-book-card">
+
+            <div class="book-plus">+</div>
+
+            <h3>Add Book</h3>
+
+            <p>Add a new book</p>
+
+        </a>
+
+    </div>
+
+</section>
+
+<script src="/js/script.js"></script>
+</body>
+</html>

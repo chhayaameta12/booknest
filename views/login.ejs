@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | BookNest</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-badge">📚 BookNest</div>
+        <h1>Welcome back</h1>
+        <p>Pick up your reading journey where you left off.</p>
+
+        <form action="/login" method="POST" class="auth-form">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="your@email.com" required>
+
+            <label>Password</label>
+            <input type="password" name="password" placeholder="Enter your password" required>
+
+            <button type="submit">Login</button>
+        </form>
+
+        <a href="/auth/google" class="auth-google-btn">Sign in with Google</a>
+        <p style="margin-top: 12px; font-size: 0.9rem; color: #7a533c;"></p>
+
+        <p class="auth-link">
+            New here?
+            <a href="/register">Create an account</a>
+        </p>
+    </div>
+</div>
+
+<script src="/js/script.js"></script>
+</body>
+</html>

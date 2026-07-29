@@ -1,0 +1,130 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard | BookNest</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+<body>
+
+<nav>
+
+<a href="/dashboard" class="logo" aria-label="Book Nest dashboard">
+<img src="/images/logo.png" alt="Book Nest logo" class="logo-image">
+<span class="logo-text">Book Nest</span>
+</a>
+
+<ul>
+<li><a href="/dashboard">Dashboard</a></li>
+<li><a href="/genres">My Shelves</a></li>
+<li><a href="/profile">Profile</a></li>
+<li><a href="/logout">Logout</a></li>
+</ul>
+
+</nav>
+
+<section class="dashboard">
+
+<div class="welcome">
+    <div class="welcome-text">
+        <h1>Welcome back, <%= user && user.name ? user.name : 'Reader' %> 👋</h1>
+        <p>Every page you read becomes a part of your story.</p>
+    </div>
+    <div class="welcome-pill">📖 Your reading journal</div>
+</div>
+
+<section class="status-grid">
+    <div class="status-card">
+        <div class="status-icon">📖</div>
+        <h3>Currently Reading</h3>
+        <h2><%= currentlyReading %></h2>
+        <span>books in progress</span>
+    </div>
+
+    <div class="status-card">
+        <div class="status-icon">✅</div>
+        <h3>Completed</h3>
+        <h2><%= completed %></h2>
+        <span>finished reads</span>
+    </div>
+
+    <div class="status-card">
+        <div class="status-icon">📚</div>
+        <h3>Want To Read</h3>
+        <h2><%= wantToRead %></h2>
+        <span>saved for later</span>
+    </div>
+
+    <div class="status-card">
+        <div class="status-icon">❤️</div>
+        <h3>Favourite Books</h3>
+        <h2><%= favorites %></h2>
+        <span>top picks</span>
+    </div>
+</section>
+
+<section class="dashboard-box">
+    <h2>Recently Added</h2>
+
+    <% if (books.length === 0) { %>
+        <p class="empty-state">No books added yet. Start by creating a shelf and adding your first book.</p>
+    <% } else { %>
+        <div class="bookshelf-scroll">
+            <% books.slice(0, 6).forEach(book => { %>
+                <div class="highlight-card compact-card">
+                    <% if (book.cover_url) { %>
+                        <img src="<%= book.cover_url %>" alt="<%= book.title %>">
+                    <% } %>
+                    <div>
+                        <h3><%= book.title %></h3>
+                        <p><%= book.author %></p>
+                        <p><%= book.status %></p>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+</section>
+
+<section class="dashboard-box">
+    <h2>Reading Highlights</h2>
+
+    <% if (books.length === 0) { %>
+        <p class="empty-state">Your favorite books and quotes will appear here once you add them.</p>
+    <% } else { %>
+        <div class="highlight-grid">
+            <% books.filter(book => book.favorite || book.review).slice(0, 4).forEach(book => { %>
+                <div class="highlight-card">
+                    <% if (book.cover_url) { %>
+                        <img src="<%= book.cover_url %>" alt="<%= book.title %>">
+                    <% } %>
+                    <div>
+                        <h3><%= book.title %></h3>
+                        <p><%= book.rating ? '⭐'.repeat(Math.round(book.rating)) : 'No rating yet' %></p>
+                        <p><%= book.review || 'Keep adding your thoughts about this book.' %></p>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+</section>
+
+<section class="dashboard-box">
+    <h2>Favourite Quote</h2>
+    <blockquote>"A reader lives a thousand lives before he dies."</blockquote>
+</section>
+
+</section>
+
+<script src="/js/script.js"></script>
+</body>
+</html>

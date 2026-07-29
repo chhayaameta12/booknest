@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title><%= book.title %> | BookNest</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+<nav>
+
+    <a href="/" class="logo" aria-label="Book Nest home">
+        <img src="/images/logo.png" alt="Book Nest logo" class="logo-image">
+        <span class="logo-text">Book Nest</span>
+    </a>
+
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/genres">My Shelves</a></li>
+    </ul>
+
+</nav>
+
+<main class="book-details">
+
+    <div class="book-image">
+
+        <img
+            src="<%= book.cover_url || '/images/default-book.jpg' %>"
+            alt="<%= book.title %>"
+        >
+
+    </div>
+
+    <div class="book-content">
+
+        <h1><%= book.title %></h1>
+
+        <h3>by <%= book.author %></h3>
+
+        <span class="status">
+            <%= book.status %>
+        </span>
+
+        <div class="rating">
+
+            <% for(let i = 1; i <= 5; i++) { %>
+
+                <%= i <= book.rating ? "⭐" : "☆" %>
+
+            <% } %>
+
+        </div>
+
+        <div class="detail-box">
+
+            <h2>Reading Journey</h2>
+
+            <p>
+                <strong>Started:</strong>
+                <%= book.started_date || "Not Added" %>
+            </p>
+
+            <p>
+                <strong>Finished:</strong>
+                <%= book.finished_date || "Not Added" %>
+            </p>
+
+        </div>
+
+        <div class="detail-box">
+
+            <h2>My Review</h2>
+
+            <p>
+                <%= book.review || "No review yet." %>
+            </p>
+
+        </div>
+
+        <div class="detail-box">
+
+            <h2>Favourite Quote</h2>
+
+            <blockquote>
+                "<%= book.quote || "No quote added." %>"
+            </blockquote>
+
+        </div>
+
+        <div class="actions">
+
+            <a href="/edit-book/<%= book.id %>" class="edit-btn">
+                Edit
+            </a>
+
+            <form action="/delete-book/<%= book.id %>" method="POST">
+
+                <button type="submit" class="delete-btn">
+                    Delete
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</main>
+
+<script src="/js/script.js"></script>
+</body>
+</html>

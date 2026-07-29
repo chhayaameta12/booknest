@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Shelf | BookNest</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <nav>
+        <a href="/" class="logo" aria-label="Book Nest home">
+            <img src="/images/logo.png" alt="Book Nest logo" class="logo-image">
+            <span class="logo-text">Book Nest</span>
+        </a>
+
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/genres">My Shelves</a></li>
+        </ul>
+    </nav>
+
+    <main class="add-book-container">
+
+        <div class="add-book-box">
+
+            <h1>Create a New Shelf</h1>
+
+            <p>Organize your books into beautiful collections.</p>
+
+            <form action="/add-shelf" method="POST" enctype="multipart/form-data">
+
+                <label for="name">Shelf Name</label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="e.g. Romance, Mystery, Programming"
+                    required
+                >
+
+                <label for="image">Upload Shelf Cover</label>
+                <input
+                    type="file"
+                    id="image"
+                    name="image"
+                    accept="image/*"
+                >
+
+                <label for="image_url">Or use an image URL</label>
+                <input
+                    type="text"
+                    id="image_url"
+                    name="image_url"
+                    placeholder="https://example.com/image.jpg"
+                >
+
+                <button type="submit">
+                    Create Shelf
+                </button>
+
+            </form>
+
+        </div>
+
+    </main>
+
+    <script src="/js/script.js"></script>
+</body>
+</html>

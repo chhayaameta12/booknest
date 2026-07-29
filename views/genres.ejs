@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Shelves | BookNest</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav>
+
+    <a href="/" class="logo" aria-label="Book Nest home">
+        <img src="/images/logo.png" alt="Book Nest logo" class="logo-image">
+        <span class="logo-text">Book Nest</span>
+    </a>
+
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/profile">Profile</a></li>
+    </ul>
+
+</nav>
+
+<section class="shelf-header">
+
+    <h1>📚 My Shelves</h1>
+
+    <p>
+        Organize your reading journey your way.
+        Create shelves for genres, yearly reads, favorites, or anything you like.
+    </p>
+
+</section>
+
+<section class="shelf-container">
+
+    <% shelves.forEach(shelf => { %>
+
+        <a href="/shelf/<%= shelf.id %>" class="shelf-card">
+
+            <img
+                src="<%= shelf.image_url %>"
+                alt="<%= shelf.name %>"
+            >
+
+            <div class="overlay">
+
+                <h2><%= shelf.name %></h2>
+
+                <span>Open Shelf →</span>
+
+            </div>
+
+        </a>
+
+    <% }) %>
+
+    <a href="/add-shelf" class="add-shelf-card">
+
+        <div class="plus">+</div>
+
+        <h2>Create Shelf</h2>
+
+        <p>Create your own collection</p>
+
+    </a>
+
+</section>
+
+<script src="/js/script.js"></script>
+</body>
+</html>

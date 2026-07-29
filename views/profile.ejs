@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | BookNest</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav>
+    <a href="/" class="logo" aria-label="Book Nest home">
+        <img src="/images/logo.png" alt="Book Nest logo" class="logo-image">
+        <span class="logo-text">Book Nest</span>
+    </a>
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/genres">My Shelves</a></li>
+        <li><a href="/logout">Logout</a></li>
+    </ul>
+</nav>
+
+<section class="dashboard">
+    <div class="profile-card">
+        <div class="profile-avatar-block">
+            <img class="profile-image" src="<%= user && user.profile_picture ? user.profile_picture : '/images/profile.jpg' %>" alt="Profile picture">
+            <div class="profile-details">
+                <h2><%= user && user.name ? user.name : 'Book Lover' %></h2>
+                <p><%= user && user.email ? user.email : 'No email available' %></p>
+                <p>Reading journal enthusiast</p>
+            </div>
+        </div>
+
+        <div class="profile-stats">
+            <div>
+                <h3><%= bookCount %></h3>
+                <span>Books</span>
+            </div>
+            <div>
+                <h3><%= shelfCount %></h3>
+                <span>Shelves</span>
+            </div>
+            <div>
+                <h3><%= averageRating %></h3>
+                <span>Rating</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-upload-card">
+        <h2>Update Profile Picture</h2>
+        <p>Choose a photo from your device or paste an image URL.</p>
+        <form action="/profile/update-photo" method="POST" enctype="multipart/form-data" class="profile-upload-form">
+            <input type="file" name="profile_picture" accept="image/*">
+            <input type="url" name="profile_picture_url" placeholder="https://example.com/photo.jpg" value="<%= user && user.profile_picture ? user.profile_picture : '' %>">
+            <button type="submit">Save Photo</button>
+        </form>
+    </div>
+
+    <section class="dashboard-box">
+        <h2>Reading Highlights</h2>
+        <% if (highlightBooks && highlightBooks.length > 0) { %>
+            <div class="highlight-grid">
+                <% highlightBooks.forEach(book => { %>
+                    <div class="highlight-card">
+                        <% if (book.cover_url) { %>
+                            <img src="<%= book.cover_url %>" alt="<%= book.title %>">
+                        <% } %>
+                        <div>
+                            <h3><%= book.title %></h3>
+                            <p><%= book.rating ? '⭐'.repeat(Math.round(book.rating)) : 'No rating yet' %></p>
+                            <p><%= book.review || 'Add a review to highlight this book here.' %></p>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <p class="empty-state">No highlights yet. Add a favorite book with a review to see it here.</p>
+        <% } %>
+    </section>
+</section>
+
+<script src="/js/script.js"></script>
+</body>
+</html>
