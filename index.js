@@ -81,11 +81,10 @@ app.set("view engine", "ejs");
 
 
 const db = new pg.Client({
-    user: "postgres",
-    host: "localhost",
-    database: "booknest",
-    password: "Chh@y@12",
-    port: 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 db.connect()
