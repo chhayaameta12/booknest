@@ -11,6 +11,17 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+
+
+dotenv.config({ override: true });
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const saltRounds = 10;
 
@@ -22,29 +33,18 @@ if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, uploadDir),
-    filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname) || ".jpg";
-        const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
-        cb(null, uniqueName);
-    }
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "booknest",
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+  },
 });
 
 const upload = multer({
-    storage,
-    limits: { fileSize: 5 * 1024 * 1024 },
-    fileFilter: (req, file, cb) => {
-        if (file.mimetype.startsWith("image/")) {
-            cb(null, true);
-        } else {
-            cb(new Error("Only image files are allowed"), false);
-        }
-    }
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
 });
-
-
-dotenv.config({ override: true });
 
 const app = express();
 const port = 3000;
@@ -80,19 +80,26 @@ app.set("view engine", "ejs");
 
 
 
-const db = new pg.Client({
+const dbConfig = {
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
+};
 
-db.connect()
-    .then(async () => {
-        console.log("✅ Connected to PostgreSQL");
-        await ensureAuthColumns();
-    })
-    .catch(err => console.error("❌ Database connection failed:", err));
+if (process.env.DATABASE_URL && !process.env.DATABASE_URL.includes("localhost") && !process.env.DATABASE_URL.includes("127.0.0.1")) {
+  dbConfig.ssl = { rejectUnauthorized: false };
+}
+
+const db = new pg.Client(dbConfig);
+
+if (process.env.DATABASE_URL) {
+    db.connect()
+        .then(async () => {
+            console.log("✅ Connected to PostgreSQL");
+            await ensureAuthColumns();
+        })
+        .catch(err => console.error("❌ Database connection failed:", err));
+} else {
+    console.warn("⚠️ DATABASE_URL is not set. Add it to your .env file to enable database features.");
+}
 
 async function ensureAuthColumns() {
     try {
@@ -262,8 +269,8 @@ app.post("/add-shelf", isAuthenticated, upload.single("image"), async (req, res)
 
     const { name } = req.body;
     const image = req.file
-        ? `/images/uploads/${req.file.filename}`
-        : (req.body.image_url || null);
+    ? req.file.path
+    : (req.body.image_url || null);
 
     await db.query(
         "INSERT INTO shelves(name, image_url) VALUES($1, $2)",
@@ -340,8 +347,8 @@ app.post("/add-book/:id", isAuthenticated, upload.single("cover_image"), async (
     const finishedDate = finished_date || null;
     const bookRating = rating || null;
     const coverImage = req.file
-        ? `/images/uploads/${req.file.filename}`
-        : (cover_url || null);
+    ? req.file.path
+    : (cover_url || null);
 
     await db.query(
         `INSERT INTO books
@@ -477,8 +484,8 @@ app.post("/register", upload.single("profile_picture"), async (req, res) => {
 
     const { name, email, password } = req.body;
     const profilePicture = req.file
-        ? `/images/uploads/${req.file.filename}`
-        : (req.body.profile_picture_url || req.body.profile_picture || null);
+    ? req.file.path
+    : (req.body.profile_picture_url || req.body.profile_picture || null);
 
     try {
 
@@ -585,7 +592,7 @@ app.get("/profile", isAuthenticated, async (req, res) => {
 
 app.post("/profile/update-photo", isAuthenticated, upload.single("profile_picture"), async (req, res) => {
     const profilePicture = req.file
-        ? `/images/uploads/${req.file.filename}`
+        ? req.file.path
         : (req.body.profile_picture_url || req.body.profile_picture || null);
 
     try {
