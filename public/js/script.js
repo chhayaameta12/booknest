@@ -18,6 +18,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const overlay = document.querySelector(".page-flip-overlay");
+    overlay.classList.remove("active");
+
+    window.addEventListener("pageshow", () => {
+        overlay.classList.remove("active");
+    });
 
     document.querySelectorAll('a[href]').forEach((link) => {
         const href = link.getAttribute("href") || "";
@@ -41,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
             overlay.classList.add("active");
             setTimeout(() => {
                 window.location.href = href;
-            }, 350);
+            }, 220);
         });
     });
 });

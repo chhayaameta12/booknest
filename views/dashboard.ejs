@@ -81,9 +81,7 @@
         <div class="bookshelf-scroll">
             <% books.slice(0, 6).forEach(book => { %>
                 <div class="highlight-card compact-card">
-                    <% if (book.cover_url) { %>
-                        <img src="<%= book.cover_url %>" alt="<%= book.title %>">
-                    <% } %>
+                    <img src="<%= book.cover_url || '/images/default-book.jpg' %>" alt="<%= book.title %>">
                     <div>
                         <h3><%= book.title %></h3>
                         <p><%= book.author %></p>

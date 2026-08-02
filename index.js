@@ -105,6 +105,8 @@ async function ensureAuthColumns() {
     try {
         await db.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS google_id VARCHAR(255)");
         await db.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS provider VARCHAR(50) DEFAULT 'local'");
+        await db.query("ALTER TABLE shelves ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id) ON DELETE CASCADE");
+        await db.query("ALTER TABLE books ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id) ON DELETE CASCADE");
     } catch (err) {
         console.warn("⚠️ Could not ensure auth columns:", err.message);
     }
@@ -273,8 +275,8 @@ app.post("/add-shelf", isAuthenticated, upload.single("image"), async (req, res)
     : (req.body.image_url || null);
 
     await db.query(
-        "INSERT INTO shelves(name, image_url) VALUES($1, $2)",
-        [name, image]
+        "INSERT INTO shelves(name, image_url, user_id) VALUES($1, $2, $3)",
+        [name, image, req.user.id]
     );
 
     res.redirect("/genres");
@@ -283,7 +285,8 @@ app.post("/add-shelf", isAuthenticated, upload.single("image"), async (req, res)
 app.get("/genres", isAuthenticated, async (req, res) => {
 
     const result = await db.query(
-        "SELECT * FROM shelves ORDER BY id"
+        "SELECT * FROM shelves WHERE user_id=$1 ORDER BY id",
+        [req.user.id]
     );
 
     res.render("genres", {
@@ -296,13 +299,13 @@ app.get("/shelf/:id", isAuthenticated, async (req, res) => {
     const shelfId = req.params.id;
 
     const shelf = await db.query(
-        "SELECT * FROM shelves WHERE id=$1",
-        [shelfId]
+        "SELECT * FROM shelves WHERE id=$1 AND user_id=$2",
+        [shelfId, req.user.id]
     );
 
     const books = await db.query(
-        "SELECT * FROM books WHERE shelf_id=$1 ORDER BY created_at DESC",
-        [shelfId]
+        "SELECT * FROM books WHERE shelf_id=$1 AND user_id=$2 ORDER BY created_at DESC",
+        [shelfId, req.user.id]
     );
 
     res.render("shelf", {
@@ -314,8 +317,8 @@ app.get("/shelf/:id", isAuthenticated, async (req, res) => {
 app.get("/add-book/:id", isAuthenticated, async (req, res) => {
 
     const shelf = await db.query(
-        "SELECT * FROM shelves WHERE id=$1",
-        [req.params.id]
+        "SELECT * FROM shelves WHERE id=$1 AND user_id=$2",
+        [req.params.id, req.user.id]
     );
 
     res.render("addBook", {
@@ -354,6 +357,7 @@ app.post("/add-book/:id", isAuthenticated, upload.single("cover_image"), async (
         `INSERT INTO books
         (
             shelf_id,
+            user_id,
             title,
             author,
             cover_url,
@@ -365,9 +369,10 @@ app.post("/add-book/:id", isAuthenticated, upload.single("cover_image"), async (
             finished_date,
             favorite
         )
-        VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+        VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
         [
             shelfId,
+            req.user.id,
             title,
             author,
             coverImage,
@@ -538,14 +543,16 @@ app.post("/register", upload.single("profile_picture"), async (req, res) => {
 app.get("/dashboard", isAuthenticated, async (req, res) => {
     try {
         const booksResult = await db.query(
-            "SELECT * FROM books ORDER BY created_at DESC"
+            "SELECT * FROM books WHERE user_id=$1 ORDER BY created_at DESC",
+            [req.user.id]
         );
         const books = booksResult.rows;
 
-        const currentlyReading = books.filter((book) => book.status === "currently reading").length;
-        const completed = books.filter((book) => book.status === "completed").length;
-        const wantToRead = books.filter((book) => book.status === "want to read").length;
-        const favorites = books.filter((book) => book.favorite === true).length;
+        const normalize = (value) => (value || "").toString().trim().toLowerCase();
+        const currentlyReading = books.filter((book) => normalize(book.status) === "reading").length;
+        const completed = books.filter((book) => normalize(book.status) === "completed").length;
+        const wantToRead = books.filter((book) => normalize(book.status) === "want to read").length;
+        const favorites = books.filter((book) => book.favorite === true || book.favorite === "true").length;
 
         res.render("dashboard", {
             user: req.user,
@@ -568,13 +575,21 @@ app.get("/profile", isAuthenticated, async (req, res) => {
             [req.user.id]
         );
 
-        const shelfCountResult = await db.query("SELECT COUNT(*)::int AS count FROM shelves");
-        const bookCountResult = await db.query("SELECT COUNT(*)::int AS count FROM books");
+        const shelfCountResult = await db.query(
+            "SELECT COUNT(*)::int AS count FROM shelves WHERE user_id=$1",
+            [req.user.id]
+        );
+        const bookCountResult = await db.query(
+            "SELECT COUNT(*)::int AS count FROM books WHERE user_id=$1",
+            [req.user.id]
+        );
         const ratingResult = await db.query(
-            "SELECT COALESCE(AVG(rating), 0)::float AS average_rating FROM books WHERE rating IS NOT NULL"
+            "SELECT COALESCE(AVG(rating), 0)::float AS average_rating FROM books WHERE user_id=$1 AND rating IS NOT NULL",
+            [req.user.id]
         );
         const highlightBooksResult = await db.query(
-            "SELECT * FROM books WHERE favorite=true OR review IS NOT NULL ORDER BY created_at DESC LIMIT 4"
+            "SELECT * FROM books WHERE user_id=$1 AND (favorite=true OR review IS NOT NULL) ORDER BY created_at DESC LIMIT 4",
+            [req.user.id]
         );
 
         res.render("profile", {
